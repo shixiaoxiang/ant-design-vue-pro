@@ -18,6 +18,20 @@
             <a-input
               size="large"
               type="text"
+              placeholder="代理地址: ip/host:port"
+              v-decorator="[
+                'host',
+                {rules: [{ required: true, message: '请输入e-mitter代理的ip或域名' }, { validator: handleHostOrIp }], validateTrigger: 'change'}
+              ]"
+            >
+              <a-icon slot="prefix" type="global" :style="{ color: 'rgba(0,0,0,.25)' }"/>
+            </a-input>
+          </a-form-item>
+
+          <a-form-item>
+            <a-input
+              size="large"
+              type="text"
               placeholder="账户: admin"
               v-decorator="[
                 'username',
@@ -41,7 +55,7 @@
             </a-input-password>
           </a-form-item>
         </a-tab-pane>
-        <a-tab-pane key="tab2" tab="手机号登录">
+       <!--  <a-tab-pane key="tab2" tab="手机号登录">
           <a-form-item>
             <a-input size="large" type="text" placeholder="手机号" v-decorator="['mobile', {rules: [{ required: true, pattern: /^1[34578]\d{9}$/, message: '请输入正确的手机号' }], validateTrigger: 'change'}]">
               <a-icon slot="prefix" type="mobile" :style="{ color: 'rgba(0,0,0,.25)' }"/>
@@ -66,10 +80,10 @@
               ></a-button>
             </a-col>
           </a-row>
-        </a-tab-pane>
+        </a-tab-pane> -->
       </a-tabs>
 
-      <a-form-item>
+     <!--  <a-form-item>
         <a-checkbox v-decorator="['rememberMe', { valuePropName: 'checked' }]">自动登录</a-checkbox>
         <router-link
           :to="{ name: 'recover', params: { user: 'aaa'} }"
@@ -77,7 +91,7 @@
           style="float: right;"
         >忘记密码</router-link>
       </a-form-item>
-
+ -->
       <a-form-item style="margin-top:24px">
         <a-button
           size="large"
@@ -89,7 +103,7 @@
         >确定</a-button>
       </a-form-item>
 
-      <div class="user-login-other">
+    <!--   <div class="user-login-other">
         <span>其他登录方式</span>
         <a>
           <a-icon class="item-icon" type="alipay-circle"></a-icon>
@@ -101,7 +115,7 @@
           <a-icon class="item-icon" type="weibo-circle"></a-icon>
         </a>
         <router-link class="register" :to="{ name: 'register' }">注册账户</router-link>
-      </div>
+      </div> -->
     </a-form>
 
     <two-step-captcha
@@ -166,6 +180,9 @@ export default {
       }
       callback()
     },
+    handleHostOrIp (rule, value, callback) {
+      callback()
+    },
     handleTabClick (key) {
       this.customActiveKey = key
       // this.form.resetFields()
@@ -181,13 +198,14 @@ export default {
 
       state.loginBtn = true
 
-      const validateFieldsKey = customActiveKey === 'tab1' ? ['username', 'password'] : ['mobile', 'captcha']
+      const validateFieldsKey = customActiveKey === 'tab1' ? ['host', 'username', 'password'] : ['mobile', 'captcha']
 
       validateFields(validateFieldsKey, { force: true }, (err, values) => {
         if (!err) {
           console.log('login form', values)
           const loginParams = { ...values }
           delete loginParams.username
+          loginParams.host = values.host
           loginParams[!state.loginType ? 'email' : 'username'] = values.username
           loginParams.password = md5(values.password)
           Login(loginParams)
